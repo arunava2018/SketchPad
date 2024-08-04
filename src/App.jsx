@@ -33,7 +33,7 @@ export default function App() {
   const isPaining = useRef();
   const currentShapeId = useRef();
   const transformerRef = useRef();
-
+  
   const isDraggable = action === ACTIONS.SELECT;
   useEffect(() => {
     if (theme === "dark") {
@@ -45,7 +45,19 @@ export default function App() {
   const handleThemeSwitch = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
-  function onPointerDown() {
+  const resetCanvas = () => {
+    setRectangles([]);
+    setCircles([]);
+    setArrows([]);
+    setScribbles([]);
+    if (transformerRef.current) {
+      transformerRef.current.nodes([]);
+    }
+  };
+
+  function onPointerDown(e) {
+    if (e.target.attrs.id === "resetButton") return;
+
     if (action === ACTIONS.SELECT) return;
 
     const stage = stageRef.current;
@@ -192,7 +204,7 @@ export default function App() {
     <>
       <div className="relative w-full h-screen overflow-hidden">
         {/* Controls */}
-        <div className="absolute top-0 z-10 w-full py-2 text-center">
+        <div className="absolute top-0 z-10 w-full py-2 text-center flex flex-col items-center justify-between">
           <div className="flex justify-center items-center sm:gap-3 py-2 px-3 w-fit mx-auto border shadow-lg rounded-lg dark:bg-slate-900  dark:text-white">
             <button
               className={
@@ -273,6 +285,16 @@ export default function App() {
             Click and drag, release when you're finished
           </p>
         </div>
+        <button 
+          id="resetButton"
+          className={
+            theme === "dark"
+              ? "absolute bottom-10 z-20 left-1/2 transform -translate-x-1/2 text-white border-2 border-blue-200 px-1 py-1 rounded-md"
+              : "absolute bottom-10 z-20 left-1/2 transform -translate-x-1/2 text-black border-2 border-black px-1 py-1 rounded-md"
+          } onClick={resetCanvas}
+        >
+          Clear Canvas
+        </button>
 
         {/* Canvas */}
         <div>
