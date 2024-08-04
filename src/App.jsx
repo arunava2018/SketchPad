@@ -289,8 +289,8 @@ export default function App() {
           id="resetButton"
           className={
             theme === "dark"
-              ? "absolute bottom-10 sm:bottom-4 z-20 left-1/2 transform -translate-x-1/2 text-white border-2 border-blue-200 px-1 py-1 rounded-md"
-              : "absolute bottom-10 sm:bottom-4 z-20 left-1/2 transform -translate-x-1/2 text-black border-2 border-black px-1 py-1 rounded-md"
+              ? "absolute bottom-10 md:bottom-4 z-20 left-1/2 transform -translate-x-1/2 text-white border-2 border-blue-200 px-1 py-1 rounded-md"
+              : "absolute bottom-10 md:bottom-4 z-20 left-1/2 transform -translate-x-1/2 text-black border-2 border-black px-1 py-1 rounded-md"
           } onClick={resetCanvas}
         >
           Clear Canvas
