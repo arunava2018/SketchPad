@@ -6,6 +6,7 @@ import { GiArrowCursor } from "react-icons/gi";
 import { FaRegCircle } from "react-icons/fa6";
 import { IoMoonSharp } from "react-icons/io5";
 import { IoIosSunny } from "react-icons/io";
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   Arrow,
   Circle,
@@ -28,12 +29,11 @@ export default function App() {
   const [circles, setCircles] = useState([]);
   const [arrows, setArrows] = useState([]);
   const [scribbles, setScribbles] = useState([]);
-
   const strokeColor = theme === "dark" ? "#ffffff" : "#000000";
   const isPaining = useRef();
   const currentShapeId = useRef();
   const transformerRef = useRef();
-  
+
   const isDraggable = action === ACTIONS.SELECT;
   useEffect(() => {
     if (theme === "dark") {
@@ -42,9 +42,14 @@ export default function App() {
       document.documentElement.classList.remove("dark");
     }
   });
+
+  const { logout } = useAuth0();
+  const { loginWithRedirect } = useAuth0();
+  const { user, isAuthenticated, isLoading } = useAuth0();
   const handleThemeSwitch = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
+
   const resetCanvas = () => {
     setRectangles([]);
     setCircles([]);
@@ -117,6 +122,7 @@ export default function App() {
         break;
     }
   }
+
   function onPointerMove() {
     if (action === ACTIONS.SELECT || !isPaining.current) return;
 
@@ -183,6 +189,7 @@ export default function App() {
   function onPointerUp() {
     isPaining.current = false;
   }
+
   function handleExport() {
     const uri = stageRef.current.toDataURL();
     var link = document.createElement("a");
@@ -205,7 +212,7 @@ export default function App() {
       <div className="relative w-full h-screen overflow-hidden">
         {/* Controls */}
         <div className="absolute top-0 z-10 w-full py-2 text-center flex flex-col items-center justify-between">
-          <div className="flex justify-center items-center sm:gap-3 py-2 px-3 w-fit mx-auto border shadow-lg rounded-lg dark:bg-slate-900  dark:text-white">
+          <div className="flex justify-center items-center sm:gap-3 py-2 px-3 w-fit mx-auto border shadow-lg rounded-lg dark:bg-slate-900 dark:text-white">
             <button
               className={
                 action === ACTIONS.SELECT
@@ -219,8 +226,8 @@ export default function App() {
             <button
               className={
                 action === ACTIONS.RECTANGLE
-                  ? "bg-violet-300 p-1  dark:bg-violet-400"
-                  : "p-1 hover:bg-violet-100 rounded  dark:hover:bg-gray-600"
+                  ? "bg-violet-300 p-1 dark:bg-violet-400"
+                  : "p-1 hover:bg-violet-100 rounded dark:hover:bg-gray-600"
               }
               onClick={() => setAction(ACTIONS.RECTANGLE)}
             >
@@ -229,8 +236,8 @@ export default function App() {
             <button
               className={
                 action === ACTIONS.CIRCLE
-                  ? "bg-violet-300 p-1 rounded  dark:bg-violet-400"
-                  : "p-1 hover:bg-violet-100 rounded  dark:hover:bg-gray-600"
+                  ? "bg-violet-300 p-1 rounded dark:bg-violet-400"
+                  : "p-1 hover:bg-violet-100 rounded dark:hover:bg-gray-600"
               }
               onClick={() => setAction(ACTIONS.CIRCLE)}
             >
@@ -239,8 +246,8 @@ export default function App() {
             <button
               className={
                 action === ACTIONS.ARROW
-                  ? "bg-violet-300 p-1 rounded  dark:bg-violet-400"
-                  : "p-1 hover:bg-violet-100 rounded  dark:hover:bg-gray-600"
+                  ? "bg-violet-300 p-1 rounded dark:bg-violet-400"
+                  : "p-1 hover:bg-violet-100 rounded dark:hover:bg-gray-600"
               }
               onClick={() => setAction(ACTIONS.ARROW)}
             >
@@ -250,7 +257,7 @@ export default function App() {
               className={
                 action === ACTIONS.SCRIBBLE
                   ? "bg-violet-300 p-1 rounded dark:bg-violet-400"
-                  : "p-1 hover:bg-violet-100 rounded  dark:hover:bg-gray-600"
+                  : "p-1 hover:bg-violet-100 rounded dark:hover:bg-gray-600"
               }
               onClick={() => setAction(ACTIONS.SCRIBBLE)}
             >
@@ -285,17 +292,6 @@ export default function App() {
             Click and drag, release when you're finished
           </p>
         </div>
-        <button 
-          id="resetButton"
-          className={
-            theme === "dark"
-              ? "absolute bottom-10 md:bottom-4 z-20 left-1/2 transform -translate-x-1/2 text-white border-2 border-blue-200 px-1 py-1 rounded-md"
-              : "absolute bottom-10 md:bottom-4 z-20 left-1/2 transform -translate-x-1/2 text-black border-2 border-black px-1 py-1 rounded-md"
-          } onClick={resetCanvas}
-        >
-          Clear Canvas
-        </button>
-
         {/* Canvas */}
         <div>
           <Stage
@@ -379,6 +375,43 @@ export default function App() {
               <Transformer ref={transformerRef} />
             </Layer>
           </Stage>
+        </div>
+
+        <div className="absolute bottom-20 md:bottom-10 left-1/2 transform -translate-x-1/2 flex flex-row space-x-5">
+          <button
+            id="resetButton"
+            className={
+              theme === "dark"
+                ? "text-white border-2 border-violet-400 bg-violet-400 px-2 py-2 rounded-md text-xs sm:text-xl"
+                : "text-black border-2 border-violet-400 bg-violet-400 px-2 py-2 rounded-md text-xs sm:text-xl"
+            }
+            onClick={resetCanvas}
+          >
+            Clear Canvas
+          </button>
+          {isAuthenticated ?(
+          <button
+            className={
+              theme === "dark"
+                ? "text-white border-2 border- px-2 py-2 border-violet-400 rounded-md text-xs sm:text-xl bg-violet-400"
+                : "text-black border-2 border-violet-400 px-2 py-2 rounded-md text-xs sm:text-xl bg-violet-400"
+            }
+            onClick={() =>
+              logout({ logoutParams: { returnTo: window.location.origin } })
+            }
+          >
+            Log Out
+          </button>)
+          :(<button
+            className={
+              theme === "dark"
+                ? "text-white border-2 border-violet-400 px-2 py-2 rounded-md text-xs sm:text-xl bg-violet-400"
+                : "text-black border-2 border-violet-400 px-2 py-2 rounded-md text-xs sm:text-xl bg-violet-400"
+            }
+            onClick={() => loginWithRedirect()}
+          >
+            LogIn
+          </button>)}
         </div>
       </div>
     </>
